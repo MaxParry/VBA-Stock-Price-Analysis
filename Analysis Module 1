@@ -1,0 +1,98 @@
+Sub StockSummary():
+    
+    ' Declare worksheet object for iteration
+    Dim ws As Worksheet
+    ' Declare row counter for value pulling/ writing
+    Dim i As Long
+    ' Declare last row storage variable
+    Dim RowNum As Long
+    ' Declare variable to hold running volume total
+    Dim RunTot As Double
+    ' Declare variable to offset value writing
+    Dim PasteOffset As Integer
+    ' Set variable to row below headers
+    PasteOffset = 2
+    ' Declare variable to store first iteration open price
+    Dim OpenPrice As Double
+    ' Declare variable to store last iteration close price
+    Dim ClosePrice As Double
+    ' Declare variable to store percent change calc result
+    Dim PctChg As Double
+    ' Declare variable to hold first iteration state
+    Dim FirstTime As Integer
+    FirstTime = 0
+    ' Declare variable to hold yearly change (calculated from openprice and closeprice)
+    Dim YrChg As Double
+
+    ' Begin looping over worksheets
+    For Each ws In Worksheets
+        ' Write headers in print area
+        ws.Cells(1, 9).Value = "<ticker>"
+        ws.Cells(1, 10).Value = "<Yearly Change>"
+        ws.Cells(1, 11).Value = "<Percent Change>"
+        ws.Cells(1, 12).Value = "<total volume>"
+        ' Determine number of occupied rows for the sheet
+        RowNum = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+        ' Begin iterating over rows in sheet
+        For i = 2 To RowNum
+            ' Test if ticker of current row is same as next row (all but last condition)
+            If ws.Cells(i, 1) = ws.Cells(i, 1).Offset(1, 0) Then
+                ' If ticker is same as the one below, increment firsttime
+                ' The first time through the loop, firsttime will be 1 for the following test
+                ' This is the only iteration where firsttime is 1, until the last row,
+                ' where firsttime will be reset. This is a way to execute an if statement
+                ' only if it is the first time going through the loop.
+                FirstTime = FirstTime + 1
+                ' Add volume cell for current row to running total
+                RunTot = RunTot + ws.Cells(i, 7)
+                ' Test if this is first time through loop for ticker in question
+                If FirstTime = 1 Then
+                    ' If it is, then grab open price for this first row of ticker,
+                    ' and store for subsequent percent change calculation
+                    OpenPrice = ws.Cells(i, 3)
+                ' If it isn't the first time through the loop, do nothing
+                Else
+                End If
+            Else
+                ' This else block is only reached when the loop hits the very last row
+                ' of the current ticker
+                ' In this case, the volume is added to running total as normal
+                RunTot = RunTot + ws.Cells(i, 7)
+                ' Write the ticker and final volume total to the print area
+                ws.Cells(PasteOffset, 9) = ws.Cells(i, 1)
+                ws.Cells(PasteOffset, 12) = RunTot
+                ' Grab the value of closing price in this last row and store for pct chg calc
+                ClosePrice = ws.Cells(i, 6)
+                ' Calculate percent change and yearly change with the stored variables
+                ' If statement prevents dividing by zero if stock values are 0
+                If OpenPrice <> 0 Then
+                    PctChg = ((ClosePrice - OpenPrice) / OpenPrice)
+                    YrChg = ClosePrice - OpenPrice
+                Else
+                    PctChg = 0
+                    YrChg = 0
+                End If
+                ' Write percent change to print area using the paste offset to determine where
+                ws.Cells(PasteOffset, 11) = PctChg
+                ws.Cells(PasteOffset, 11).NumberFormat = "0.00%"
+                ws.Cells(PasteOffset, 10) = YrChg
+                   ' Evaluate whether the value is above or below 0, and color interior of cell
+                    If ws.Cells(PasteOffset, 10).Value > 0 Then
+                        ws.Cells(PasteOffset, 10).Interior.ColorIndex = 4
+                    Else
+                        ws.Cells(PasteOffset, 10).Interior.ColorIndex = 3
+                    End If
+                ' Reset running total for next ticker group
+                RunTot = 0
+                ' Increment the paste offset for the printing so next group doesn't overwrite
+                PasteOffset = PasteOffset + 1
+                ' Reset first time through loop counter for next ticker group
+                FirstTime = 0
+            End If
+        Next i
+    ' Reset paste offset for next worksheet so printing starts again at row 2
+    PasteOffset = 2
+    ' Repeat proccess for next worksheet
+    Next ws
+End Sub

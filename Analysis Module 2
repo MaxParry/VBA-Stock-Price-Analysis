@@ -1,0 +1,78 @@
+Sub ExtremeCheck():
+    ' Declare for loop row counter
+    Dim i As Long
+    ' Declare for loop column counter
+    Dim j As Integer
+    ' Declare variable to store highest number
+    Dim TopDog As Double
+    ' Declare variable to store lowest number
+    Dim UnderDog As Double
+    ' Declare variable to store last row
+    Dim RowNum As Long
+    ' Declare worksheet object
+    Dim ws As Worksheet
+    ' Declare variables to hold ticker names
+    Dim HiTicker As String
+    Dim LwTicker As String
+    ' Declare variable to hold paste offset increment
+    Dim PstOS As Integer
+
+    ' Loop over worksheets
+    For Each ws In Worksheets
+        ' Title headers
+        ws.Cells(1, 15).Value = "Ticker"
+        ws.Cells(1, 16).Value = "Value"
+        ws.Cells(2, 14).Value = "Greatest % Increase"
+        ws.Cells(3, 14).Value = "Greatest % Decrease"
+        ws.Cells(4, 14).Value = "Greatest Total Volume"
+        ws.Cells(5, 14).Value = "Least Total Volume"
+        
+        ' Set paste offset, highest number, lowest number variables to zero
+        PstOS = 0
+        TopDog = 0
+        UnderDog = 0
+        ' Determine number of rows in sheet
+        RowNum = ws.Cells(Rows.Count, 9).End(xlUp).Row
+        
+        ' Loop over columns
+        For j = 11 To 12
+            ' Loop over rows
+            For i = 2 To RowNum
+                'Test to see if current row value is higher than stored
+                If ws.Cells(i, j).Value > TopDog Then
+                    ' If row considered is higher, make it the new topdog, and grab its name
+                    TopDog = ws.Cells(i, j).Value
+                    HiTicker = ws.Cells(i, 9).Value
+                Else
+                End If
+                ' Now check to see if the row considered is lower than lowest value
+                ' If it is, make it the new underdog and grab its name
+                If ws.Cells(i, j).Value < UnderDog Then
+                    UnderDog = ws.Cells(i, j).Value
+                    LwTicker = ws.Cells(i, 9).Value
+                Else
+                End If
+                
+            Next i
+        ' After checking all rows, print the topdog number and its ticker name
+        ws.Cells(2 + PstOS, 15).Value = HiTicker
+        ws.Cells(2 + PstOS, 16).Value = TopDog
+        ' Same with underdog
+        ws.Cells(3 + PstOS, 15).Value = LwTicker
+        ws.Cells(3 + PstOS, 16).Value = UnderDog
+        ' Reset all variables
+        HiTicker = "None"
+        LwTicker = "None"
+        TopDog = 0
+        UnderDog = 0
+        ' Increment paste offset so next paste happens below
+        PstOS = PstOS + 2
+        Next j
+    ' Erase last row of readout, not relevant
+    ws.Range("N5:P5").Value = ""
+    ' Change percent change values to proper format
+    ws.Range("P2:P3").NumberFormat = "0.00%"
+    Next ws
+End Sub
+
+    
