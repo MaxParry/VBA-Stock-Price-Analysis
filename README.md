@@ -124,7 +124,7 @@ This results in the final summary table:
 ![Yearly Winners and Losers](Images/yearly_winners.png)
 
 
-Now that the script is written, it can summarize any number of year's worth of stock data to find the best and worst performing stocks. The results for each year in the workbook can be seen below.
+Now that the script is written, it can summarize any number of year's worth of stock data to find the best and worst performing stocks. The results for each year in the workbook can be seen below, where the script is run on the full-size dataset.
 
 ##### 2012:
 ![2012 Screenshot](Images/2012_analysis_screenshot.png)
