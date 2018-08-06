@@ -1,12 +1,13 @@
 # VBA Stock Price Analysis
-## Stock price analysis using Excel VBA macros
+## Stock price analysis using Excel VBA (macros)
 
 ![Stock Chart Art](Images/stock_chart_art.png)
 
 The beauty of automating repetitive tasks in Excel with VBA scripting is demonstrated in this analysis, which seeks to answer the following questions:
 
-Which stock had the highest trading volume in each year? The lowest?
-Which stock performed best in each year? The worst?
+From 2012-2016...
+* Which NYSE stock had the highest trading volume in each year? The lowest?
+* Which NYSE stock performed best in each year? The worst?
 
 ## Data Structure
 The data began as an Excel workbook consisting of 5 spreadsheets, one for each year between 2012 and 2016.
@@ -23,10 +24,31 @@ Each spreadsheet consists of over half a million rows of data, one row represent
 ## Testing Data
 Because the dataset is so large, it was necessary to create a smaller set for testing. In order to cut down on processing time during writing and debugging the VBA script, the larger dataset was truncated to ~10,000 rows per spreadsheet.
 
-This testing file is included in the repo, as `Raw_Stock_Data_Testing.xlsx`. Due to GitHub's 100MB file size limit, the larger raw dataset, as well as the completed analyzed workbook, is stored locally. Try ![Yahoo Finance](https://finance.yahoo.com/) to download a similar dataset.
+This testing file is included in the repo, as `Raw_Stock_Data_Testing.xlsx`. Due to GitHub's 100MB file size limit, the larger raw dataset, as well as the completed analyzed workbook, is stored locally. Try [Yahoo Finance](https://finance.yahoo.com/) to download a similar dataset.
 
-## 
+## Scripting
+### Step 1: Summarizing daily data
+The first task in discovering which stocks performed best and worst in each year, was to reduce the daily trading statistics for each stock to three yearly aggregates:
+* Yearly Change ($USD difference in price between last and first trading day of the year)
+* Percent Change ([Yearly Change / price on first trading day of year * 100])
+* Total Volume (Sum of all daily trading volumes)
 
+Because this would be unfeasible to do by hand, VBA was used. 
+
+#### Outer loop
+The outer loop of the script iterates through the 5 spreadsheets in the workbook (`For Each ws In Worksheets`), each time:
+* Writing headers for the new yearly aggregate table (to the right of the raw data)
+    * format is `worksheet_object.Cells(x, y).Value = "text_to_write"`
+* Determining the last used row of the spreadsheet (on line 35) by:
+    * `RowNum = ws.Cells(Rows.Count, 1).End(xlUp).Row`:
+        * navigates to the last cell of column A using `ws.Cells(Rows.Count, 1)` 
+            * (`Rows.Count` returns last possible cell in the spreadsheet)
+        * jumping up to the last populated cell using `.End(xlUp)`,
+        * using `.Row` to access the row number of that cell, 
+        * storing it in the `RowNum` variable
+* Running the inner loop
+
+#### Inner loop
 
 
 ![Ticker Symbol Aggregation](Images/ticker_symbols.png)
